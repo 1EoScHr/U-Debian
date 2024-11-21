@@ -1,0 +1,77 @@
+# 随身Debian部署记录
+***
+## 进入系统前准备
+### 1.格式化U盘
+选择较为**高速**的盘，譬如固态U盘或硬盘，读写速度快，不会不跟手。（这里使用Kingston DTMax 256G 固态U盘）  
+工具使用**DiskGenius**，先将盘格式化，并以**GPT**格式重建引导分区，便于后续采用**GPT+UEFI**的引导来进入便携DEBIAN。由亲身经历可知用**MBR**格式笔电不识别，懒的折腾。  
+重建完后，听从建议，**先给盘内划一个1G（或更多）的NTFS空间**，以此来放置关键工具，譬如**DG**与**Linux文件查看器**等，以免带到新设备上无法检测用来排错等。**剩余的空间闲置即可**，后面将用Debian自动分区。  
+### 2.使用虚拟机安装
+使用**VMWare**工具，先下载好Debian的镜像iso，再创建新的虚拟机，创建完后删除自带的虚拟硬盘以防装错地方，**核数多设点装的快**。USB设备选择**USB3.1**，高级中选择引导设置为**UEFI**，然后进入安装界面，按照正常步骤走即可，探测磁盘时将U盘连接到虚拟机即可。  
+### 3.解决一些bug
+**直接重启进入bios仍然还会找不到Debian**，由于某些bug需要对文件再进行一些修改。原理不记，只需**将镜像iso的EFI文件下boot复制粘贴到U盘中linux文件树中的EFI文件夹内**即可。  
+>具体原理见[Debian 12移动硬盘安装完全指南](https://blog.csdn.net/mrluo735/article/details/136643692)与[移动硬盘制作随身Debian（GPT+UEFI）](https://blog.csdn.net/Asgard_Hu/article/details/131700377)
+  
+***
+***此时重启电脑进入bios就可以找到便携Debian了～***
+***
+## 进入系统后优化
+### 0.安装Vim
+**Vim**是关键编辑器呀。 
+### 1.将自己加入到sudoer中
+debian默认的用户是**没有管理员权限的**，所以为了操作方便，将自己加入到管理员中。  
+
+>su root  
+>vim /etc/sudoer  
+
+找到**root**，按照**相同的格式**将自己加入到管理员中即可。
+### 2.无线网卡驱动
+似乎由于Debian坚持**纯粹的开源精神**，一些闭源驱动并没有内置。所以没有安装大厂的驱动。进来后第一件事会发现没有无线网络，所以需要打上无线网卡驱动。  
+插上网线连上网，运行指令  
+>sudo apt update  
+>sudo apt install firmware-iwlwifi  
+
+这样就会安装好wifi的驱动，重启后就可以找到了。
+### 3.NVIDIA驱动安装
+插上外接的屏幕，无法检测，显然是原装的开源驱动不支持，得装**NVIDIA的闭源驱动**。  
+
++ 在整NV的驱动前，应该先禁用原生的开源驱动。
+  
+> 先修改*grub*项
+>> sudo vim /etc/default/grub  
+
+> 在*GRUB_CMDLINE_LINUX*项后加上  
+>> rd.driver.blacklist=nouveau  
+
+> 然后更新grub  
+>> update-grub  
+>> 或  
+>> sudo grub-mkconfig -o /boot/grub/grub.cfg  
+
+> 以上是启动时禁用，以下是系统层面禁用
+>> echo "blacklist nouveau" | sudo tee -a /etc/modprobe.d/blacklist-nvidia-nouveau.conf  
+>> echo "options nouveau modeset=0" | sudo tee -a /etc/modprobe.d/blacklist-nvidia-nouveau.conf  
+>> sudo update-initramfs -u  
+
+> 完成。
+
++ 打开NV官网根据显卡型号以及系统下载驱动，linux下会下载**.run**文件。  
++ 下载完后将其移动到主文件夹中，**以防进入文本模式后没有中文而无法进入下载文件夹**，同时赐予其**执行权**
+> sudo chmod +x NVIDIA-Linux.~.run  
+
++ 据称安装时要进入文本模式安装，则
+> sudo telinit 3  
+> sudo ./NVIDIA-Linux.~.run  
+
+> 进行安装。
+
++ 安装完毕后切换回图形化界面
+> sudo telinit 5  
++ 然后就可以调节屏幕了。
+
+***
+***基本部署已经结束，可以舒舒服服使用Debian了～***
+***
+
+## 一些拓展
++ 沉浸式翻译插件
++ ReText  *问题的关键在于深色模式*，安装**qt6ct**工具调整即可。
