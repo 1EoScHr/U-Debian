@@ -9,8 +9,8 @@
 使用**VMWare**工具，先下载好Debian的镜像iso，再创建新的虚拟机，创建完后删除自带的虚拟硬盘以防装错地方，**核数多设点装的快**。USB设备选择**USB3.1**，高级中选择引导设置为**UEFI**，然后进入安装界面，按照正常步骤走即可，探测磁盘时将U盘连接到虚拟机即可。  
 ### 3.解决一些bug
 **直接重启进入bios仍然还会找不到Debian**，由于某些bug需要对文件再进行一些修改。原理不记，只需**将镜像iso的EFI文件下boot复制粘贴到U盘中linux文件树中的EFI文件夹内**即可。  
->具体原理见[Debian 12移动硬盘安装完全指南](https://blog.csdn.net/mrluo735/article/details/136643692)与[移动硬盘制作随身Debian（GPT+UEFI）](https://blog.csdn.net/Asgard_Hu/article/details/131700377)
-  
+>具体原理见[Debian 12移动硬盘安装完全指南](https://blog.csdn.net/Asgard_Hu/article/details/131221474)与[移动硬盘制作随身Debian（GPT+UEFI）](https://blog.csdn.net/Asgard_Hu/article/details/131700377)
+  阿
 ***
 ***此时重启电脑进入bios就可以找到便携Debian了～***
 ***
@@ -77,6 +77,8 @@ debian默认的用户是**没有管理员权限的**，所以为了操作方便�
 + 浏览器->Stylus插件 *方便开夜间模式*，将csdn、baidu等变暗  
 + **ReText**  *问题的关键在于深色模式*，安装**qt6ct**工具调整即可
 + **vimplus** *自动配置vim* ，***配置过程中出现一些问题，见下方的详细配置***  
++ **自带的输入法会崩溃**，所以需要卸载掉装新的。卸载**ibus**，使用**fcitx5**并使用**-Nord**主题，更美  
++ **tldn** *too long, didn't read*  
 
 ###vimplus配置
 **vimplus**能很方便的部署多个方便的vim插件，*但作者从2022年后便不再维护*。配置过程出现一连串问题：  
@@ -93,4 +95,5 @@ debian默认的用户是**没有管理员权限的**，所以为了操作方便�
 如果要检查，输入**vim --version**，就可以看到支持项以及详细信息了。  
 
 + 如果日后要删除，**sudo make uninstall**  
-要*重新根据需求编译*，要**sudo make distclean**清除编译选项再用
+要*重新根据需求编译*，要**sudo make distclean**清除编译选项再用  
+
