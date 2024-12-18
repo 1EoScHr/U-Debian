@@ -183,18 +183,18 @@ bash中字符串可以使用`""`与`''`围起来
 `find . -path '**/test/*.py' -type f`是在当前目录下寻找有特定路径(不限前面有多少层，最终前一层是test的py文件)的文件  
 **find除搜索外还可以执行操作**，如`find . -name "*.tmp" -exec rm {} /`，会将搜索出的.tmp文件都删除掉(解释：“{}”是一个占位符，表示find搜索到的文件的路径，“/”表示exec命令的结束)  
     + 此外，还有更高级一点的fd命令，用正则表达式匹配，可以彩色输出等  
-+ **locate**，基于数据库的搜索，会事先建立所有文件的索引，用时直接匹配  
++ ***locate***，基于数据库的搜索，会事先建立所有文件的索引，用时直接匹配  
 比如`locate missing`就会输出所有包含missing子串的所有路径  
 但是要记得定期用`updatedb`更新索引库  
-+ **grep**与升级版**rg(ripgrep)**，有时候我们相比文件本身更关注文件内容，比如明确的记得文件内容中的关键字，就可以使用grep(rg)来进行查找  
++ ***grep***与升级版**rg(ripgrep)**，有时候我们相比文件本身更关注文件内容，比如明确的记得文件内容中的关键字，就可以使用grep(rg)来进行查找  
 如`grep -r namespace .`就会在当前目录中左右文件内容中寻找带有namespace  
 若用rg会更高级一点，如`rg "import requests" -t py ~/scratch`，会在对应目录的py文件中搜索带有import requests的文件  
-+ **history**查找历史命令，如`history | grep retext`会查找出所有含有retext的历史命令  
-+ **ctrl + R**输入内容倒序匹配上一条相近的命令  
-+ **fzf**模糊搜索工具  
++ ***history***查找历史命令，如`history | grep retext`会查找出所有含有retext的历史命令  
++ ***ctrl + R***输入内容倒序匹配上一条相近的命令  
++ ***fzf***模糊搜索工具  
 如`cat helloword.c | fzf`会将文件内容输出到fzf中实时搜索  
 同时还可以自动绑定到ctrl+R快捷键上，实时模糊搜索  
-+ **nnn**可视化目录访问，类似于nautilus(就是gnome的可视化)，可以方便的查看结构  
++ ***nnn***可视化目录访问，类似于nautilus(就是gnome的可视化)，可以方便的查看结构  
 
 ### 第二次作业
 + `ls -a`显示隐藏文件，`-h`大小以人类可读的单位显示，`-t`按时间排序，`-r`逆序排列，`--color=auto`打开颜色  
@@ -221,4 +221,85 @@ bash中字符串可以使用`""`与`''`围起来
     cat /home/liuzt/right.txt /home/liuzt/wrong.txt  
     echo "right all $count"  
     }  
+
++ xrags命令，命令可以从*标准输入*或*参数*中获得输入，使用管道符会将标准输出与标准输入连接起来，**但是**有的命令需要从参数获取输入，例如`rm`，所以使用xrags，**使用标准输入的内容作为输入参数，例如`ls | xrags rm`(这里也给了一个解释marcopolo的问题思路：用`echo $path > cd`没有用是因为cd需要用参数输入而不是标准输入流)  
++ 编写函数
+
+    tarhtml () {  
+    find . -name "*.html" | xrags -d '\n' tar czf htmls.tar.gz  
+}  
++ 编写函数：  
+
+    lastFile () {  
+    nowline=1  
+  
+    ls . -ltr > files.txt  
+    sed -i "$nowline"d files.txt  
+  
+    ttlline=$(grep -c "^" files.txt)  
+    
+    while [$nowline -ne $ttlline];do  
+        type=$(head -c1 files.txt)  
+        if [$type -eq "d"];then  
+            <d\>=#####  
+            ls <d\> -ltr > temp.txt  
+            sed -i 1d temp.txt  
+            cat temp.txt >> files.txt  
+            sed -i "$nowline"d files.txt  
+        else  
+            $nowline=$(($nowline + 1))  
+        fi  
+    ttlline=$(grep -c "^" files.txt)  
+    done  
+  
+    sort #####  
+}  
+
+    没有完成的地方是<d\>的获取与最后列出大表后的sort  
+    这个思路是类似广度优先搜索，一次将当前目录的所有元素列出，然后从中删除再继续  
+
+***
+
+##Lec3.文本编辑器Vim的使用
+vim是程序员写给程序员的工具，有自己的**精妙设计与哲学**  
+### 思想1：基于模式（Modal）的编辑器
+***vim的核心哲学：它的接口是种编程语言***(接口：用户与它进行交互的方式、中介物)，这意味着**不同的按键组合具有不同的效果，然后将其组合在一起**
+
+这意味vim有**多个模式**。程序员编程时往往会做不同的事：阅读代码、寻找定位某处进行小改动、写长串代码，如此不同的工作配备不同的模式。  
+
+1. **Normal Mode**：用来**移动光标、阅读代码、文件间切换**  
+    是进入Vim时默认进入的模式，"**i**"进入Insert mode，"**R**"进入Replace mode，"**v**"进入Visual mode，"**Shift+v**"进入Visual Line mode，"**Ctrl+v**"进入Visual Block mode，"**:**"进入Command Line mode  
+    要从其他模式返回，只需按"**Esc**"文件（但由于不方便按到，一般会将CapsLock映射成Esc）  
+
+
+### 一些基本操作
++ **`:q`** 退出当前**所在的window**，而非直接退出vim,只有全部的window都退出后才会退出vim  
+**`:qa`** 退出**所有的window**  
++ **`hjkl`** 光标**逐字**移动  
+**`w/b`** 光标移向**下/上一个单词**  
+**`e`** 光标移向当前**单词末尾**，继续按会到下一个单词末尾  
+**`0/$/^`** 光标移向**行首/行末/行首非空**  
++ **`ctrl`
++ **`:help`** 加上某特定键或命令来获取说明，进入相关文档，要退出文档返回原状态，输入**`:q`**即可  
+    注，操作要具体，如`:help :w`与`:help w`不同  
+
+### vim独特的buffer、tab、window概念
+**buffer：**缓冲区，用来存储文件内容。每个缓冲区对应一个文件  
+**tab：**标签页，一种组织窗口的方式。每个标签页可包含一到多个window  
+**window：**窗口，屏幕上显示缓冲内容的可视区域，每个窗口可以独立显示不同缓冲内容或同一缓冲的不同区域  
+
+**特点：**
+
++ vim层次结构：  
+**Vim**--->包含多个**tab**  
+每个**tab**--->一定数量的**window**  
+每个**window**--->对应的**buffer**(一个buffer可以同时被**零或多个**buffer打开)
+
++ *buffer*与*window***不一定是一一对应**的关系。如输入`:sp`创建另一个窗口，显示同样的内容，可以利用这一特性同时浏览同一文件不同部分  
+
+
+
+
+
+
 
