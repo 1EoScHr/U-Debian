@@ -1,8 +1,9 @@
-# 随身Debian部署记录
+# 我的Debian部署记录
+*U-Debian & x1c*
 
 ***
 
-## 进入系统前准备
+## U-Debian进入系统前准备
 
 ### 1.格式化U盘
 选择较为**高速**的盘，譬如固态U盘或硬盘，读写速度快，不会不跟手。（这里使用Kingston DTMax 256G 固态U盘）  
@@ -33,7 +34,9 @@ debian默认的用户是**没有管理员权限的**，所以为了操作方便�
 找到**root**，按照**相同的格式**在下方编辑就能将自己加入到管理员。
 
 ### 2.无线网卡驱动
-似乎由于Debian坚持**纯粹的开源精神**，一些闭源驱动并没有内置。所以没有安装大厂的驱动。进来后第一件事会发现没有无线网络，所以需要打上无线网卡驱动（这里用机拯救者y7000p 2023），但是后面用x1c2018就不用再装。  
+(似乎由于Debian坚持**纯粹的开源精神**，一些闭源驱动并没有内置。所以没有安装大厂的驱动。进来后第一件事会发现没有无线网络，所以需要打上无线网卡驱动（这里用机拯救者y7000p 2023），但是后面用x1c2018就不用再装。)  
+**勘误：**U-Debian没有无线网卡是因为安装时在vmware中，主机直接给虚拟机提供网络，在安装时没有安装驱动。所以安装好后在电脑上启动时没有无线网，而x1c安装就不一样。后来更换了ax210网卡依然可以，所以可能和我想的不一样。
+
 插上网线连上网，运行指令  
 
     sudo apt update  
@@ -82,21 +85,46 @@ debian默认的用户是**没有管理员权限的**，所以为了操作方便�
 + 然后就可以调节屏幕了。
 
 ***
-***基本部署已经结束，可以在U盘舒舒服服使用便携Debian了～***
+## ThinkPad X1 Carbon 2018部署记录
+
+1. **驱动更新：**在原生Win10上到联想support官网**更新BIOS、雷电、微码驱动**等，再换系统  
+2. **安装系统：**在装系统时由于debian的安全源在国外，没法访问，导致安装极慢，**解决方法：**  
+在选择完镜像源后，**配置apt时选择取消**，这时会提示无法连接安全源并将其注释掉，让日后想办法。这样就可以跳过安全源的配置，只下载镜像源能访问到的。在系统配置好之后到清华源等镜像官网复制全套链接。  
+3. **后续配置：**按照U-debian配置即可，根据实际情况选择为硬件驱动。  
+3. **(已经不再使用，识别效率低)指纹配置:**通过lsusb得到指纹设备“……06cb:009a Synaptics, Inc……”，选择开源库的驱动，在将其加入apt源(`sudo add-apt-repository ppa:uunicorn/open-fprintd`)
+    + 提示报错信息：`AttributeError: 'NoneType' object has no attribute 'people'`  
+    **解决方法：**缺少依赖，命令行输入：`sudo apt-get install python3-launchpadlib`即可  
+    + 提示没有release文件，根据[issue](https://github.com/uunicorn/python-validity/issues/202)中的方法，将源改为  
+`deb https://ppa.launchpadcontent.net/uunicorn/open-fprintd/ubuntu jammy main`  
+`deb-src https://ppa.launchpadcontent.net/uunicorn/open-fprintd/ubuntu jammy main`即可  
+
+    最后`$ sudo pam-auth-update`，勾选指纹即可。  
+    
+    + 睡眠后无法使用指纹并且卡顿，使用[issue](https://github.com/uunicorn/python-validity/issues/3#issuecomment-1127256921)中的解决方法  
+
+4. **(索然无味)CS1.6：**突发奇想想在这台机子上配置cs1.6,果然网上也有相关的资源。但大多是用Wine配置，没什么意思。在gamux网站上找到完美移植原生版.Appimage版本，是steam+AIbot模组的。  
+    + 安装完后反复报错，研究了几天，最后发现是安装的库不是32位的。经过评论里的指引与额外安装32位库(在apt安装时加上:i386)即可进入游戏。  
+    + 想换成中文，得知使用goldberg emu这一破解模拟器的配置语言，但按照修改后字体全部丢失，便放弃。  
+
+    安装及配置前前后后花了期末周复习的不少时间，最后仅玩了一个小时便索然无味。记忆中的这些总是如此。但总的来说，研究这个，一是大概的了解了**Appimage**文件类型，二是了解了64位与32位之间依赖关系与库的安装，也算是学到了一些东西的操作。
+
+
+***
+***基本部署已经结束，可以在U盘与x1c舒舒服服使用便携Debian了～***
 ***
 
 ## 一些拓展
 + 浏览器插件->沉浸式翻译 *看github、翻译课件*  
 + 浏览器插件->Stylus *方便开夜间模式*，将csdn、baidu、bilibili等变暗  
-+ **ReText** *问题的关键在于深色模式*，安装**qt6ct**工具调整即可
++ **ReText** *问题的关键在于深色模式*，安装**qt6ct**工具调整即可，qt6ct邀配置环境变量，在/etc/envirmonment中按照其提示，增加`QT_QPA_PLATFORMTHEME=qt6ct`即可  
 + **vimplus** *自动配置vim*，***配置过程中出现一些问题，见下方的详细配置***  
-+ **自带的输入法会崩溃**，所以需要卸载掉装新的。卸载**ibus**，使用**fcitx5**并使用**\-Nord**主题，换成最爱的字体，更美；同时要在优化页面设置自启动  
++ **自带的输入法会崩溃**，所以需要卸载掉装新的。卸载**ibus**，使用**fcitx5**并使用**\-Nord**主题，换成[漂亮的字体](https://github.com/MichaelC001/Consolas-Nerd-LXGW-Wenkai-Mono)，更美；同时要在优化页面设置自启动  
 + **tldn** *too long, didn't read*  
 + **neofetch**  
 
 
 #### vimplus配置
-
+https://github.com/MichaelC001/Consolas-Nerd-LXGW-Wenkai-Mono
 **vimplus**能很方便的部署多个方便的vim插件，*但作者从2022年后便不再维护*。配置过程出现一连串问题：  
 
 + 使用apt下载的vim会有两个插件无法使用，提示需要支持**python3**的vim版本  
@@ -114,22 +142,6 @@ debian默认的用户是**没有管理员权限的**，所以为了操作方便�
 + 如果日后要删除，**sudo make uninstall**  
 要*重新根据需求编译*，要**sudo make distclean**清除编译选项再用  
 
-***
-## ThinkPad X1 Carbon 2018部署记录
-
-1. **驱动更新：**在原生Win10上到联想support官网**更新BIOS、雷电、微码驱动**等，再换系统  
-2. **安装系统：**在装系统时由于debian的安全源在国外，没法访问，导致安装极慢，**解决方法：**  
-在选择完镜像源后，**配置apt时选择取消**，这时会提示无法连接安全源并将其注释掉，让日后想办法。这样就可以跳过安全源的配置，只下载镜像源能访问到的  
-3. **指纹配置:**通过lsusb得到指纹设备“……06cb:009a Synaptics, Inc……”，选择开源库的驱动，在将其加入apt源(`sudo add-apt-repository ppa:uunicorn/open-fprintd`)
-    + 提示报错信息：`AttributeError: 'NoneType' object has no attribute 'people'`  
-    **解决方法：**缺少依赖，命令行输入：`sudo apt-get install python3-launchpadlib`即可  
-    + 提示没有release文件，根据[issue](https://github.com/uunicorn/python-validity/issues/202)中的方法，将源改为  
-`deb https://ppa.launchpadcontent.net/uunicorn/open-fprintd/ubuntu jammy main`  
-`deb-src https://ppa.launchpadcontent.net/uunicorn/open-fprintd/ubuntu jammy main`即可  
-
-    最后`$ sudo pam-auth-update`，勾选指纹即可。  
-    
-    + 睡眠后无法使用指纹并且卡顿，使用[issue](https://github.com/uunicorn/python-validity/issues/3#issuecomment-1127256921)中的解决方法
 
 
 > 参考：  
