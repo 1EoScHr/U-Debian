@@ -13,8 +13,10 @@
 ## part2：系统配置
 1. **sudo权限**  
 	略  
+	
 2. **换源**  
 	根据清华源即可，略  
+	
 3. **闭源驱动**  
 
 	sudo apt install firmware-iwlwifi  
@@ -30,17 +32,19 @@
 	cd ~  
 	mkdir Desktop Download Templates Public Documents Music Pictures Videos  
 	rm -rf 公共 模板 视频 图片 文档 下载 音乐 桌面  
+
  	xdg-user-dirs-update --set DESKTOP ~/Desktop  
-	xdg-user-dirs-update --set DOWNLOAD ~/Download  
+ 	xdg-user-dirs-update --set DOWNLOAD ~/Download  
  	xdg-user-dirs-update --set TEMPLATES ~/Templates  
-	xdg-user-dirs-update --set PUBLICSHARE ~/Public  
-	xdg-user-dirs-update --set DOCUMENTS ~/Documents  
-	xdg-user-dirs-update --set MUSIC ~/Music  
-	xdg-user-dirs-update --set PICTURES ~/Pictures  
-	xdg-user-dirs-update --set VIDEOS ~/Videos  
+ 	xdg-user-dirs-update --set PUBLICSHARE ~/Public  
+ 	xdg-user-dirs-update --set DOCUMENTS ~/Documents  
+ 	xdg-user-dirs-update --set MUSIC ~/Music  
+ 	xdg-user-dirs-update --set PICTURES ~/Pictures  
+ 	xdg-user-dirs-update --set VIDEOS ~/Videos  
 
 5. **黑暗模式**  
 	略  
+	
 6. **字体**  
 
 	cd Download/  
@@ -56,20 +60,26 @@
 
 	sudo apt remove ibus  
 	sudo apt install fcitx5-skin-nord  
+	优化中开机自启  
 
 2. **git**  
 
 	sudo apt install git  
-	git config --global user.name "1EoScHr_Udeb"  
- 	git config --global user.email "1316757894@qq.com"  
-	ssh-keygen -t rsa -b 4096 -C "1316757894@qq.com"  
-	cat .ssh/id_rsa.pub  
+	git config --global user.name "xxx"  
+
+ 	git config --global user.email "xxx"  
+ 	ssh-keygen -t rsa -b 4096 -C "xxx"  
+ 	cat .ssh/id_rsa.pub  
 
 3. **IDE**  
-	自行下载VSC。  
+	自行下载VSC，字体更换方式：  
+	ctrl+, -> 'consolaslxgw', monospace  
+	
 4. **MarkDown**  
 
-	sudo apt install ghostwriter  
+	~~sudo apt install ghostwriter~~
+	
+	在x1c上ghostwriter有点问题，闪退严重，于是尝试**Typora**，的确挺漂亮，但是要收费，还好可以破解，先欠着，以后支持回来:(，教程为[这篇指南](https://blog.csdn.net/xueyou0910/article/details/145868822)  
 	
 5. **科学上网**  
-	cutecloud。  
+	cutecloud+hiddfy  
