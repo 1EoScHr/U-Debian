@@ -184,3 +184,19 @@ __pycache__/
 # dataset
 finalWork/Running/
 ```
+
+注意一些小语法区别：  
++ 每一项前加`/`表示只在当前项目根目录匹配，不加的话会全项目匹配
++ 要想屏蔽整个目录，用`dirname/`，会连着文件夹一起屏蔽；若想保留一些子规则，则用`dirname/*`  
+
+### git push记录中有大文件
+
+尽管有gitignore，但还是会经常性不小心push上大文件。  
+
+好在git的**git-filter-repo**工具能解决这一问题。其能够重写git历史。注意修改历史会导致目前没有保存的进度丢失。  
+
+步骤如下：  
++ 首先为保险起见，创建仓库副本：`cp -r proj/ proj_backup/`
++ 然后使用`git filter-repo --path "path/to/big-file.iso" --invert-paths`删除指定路径的大文件，有可能会提示加`--force`，因为检测出来不是新的仓库，加就行
++ 使用`git reflog expire --expire=now --all`和`git gc --prune=now --aggressive`来清除git 仓库的垃圾文件
++ 最后提交用`git push origin --force --all`来强行提交，改写历史（因为是自己的小项目，无所谓）  
